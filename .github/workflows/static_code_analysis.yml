@@ -26,7 +26,7 @@ jobs:
         uses: microsoft/setup-msbuild@v1.1
         
       - name: build sqlproj
-        working-directory: /
+        working-directory: \
         run: msbuild DatabaseCodeAnalysis.sln /p:Configuration="Release" /p:RunSqlCodeAnalysis="True" /p:SqlCodeAnalysisRules=""
         
       # - name: create dist
