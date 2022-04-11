@@ -29,16 +29,16 @@ jobs:
         # working-directory: \
         run: msbuild DatabaseCodeAnalysis.sln /p:Configuration="Release" /p:RunSqlCodeAnalysis="True" /p:SqlCodeAnalysisRules=""
         
-      # - name: create dist
-      #   run: |
-      #     $EXIST=(Test-Path '${{env.DIST_PATH}}')
-      #     if($EXIST){ remove-Item -Recurse -Force '${{env.DIST_PATH}}' }
-      #     New-Item '${{env.DIST_PATH}}' -Type directory -Force
+      - name: create dist
+        run: |
+          $EXIST=(Test-Path '${{env.DIST_PATH}}')
+          if($EXIST){ remove-Item -Recurse -Force '${{env.DIST_PATH}}' }
+          New-Item '${{env.DIST_PATH}}' -Type directory -Force
 
-      # - name: collect msbuild report
-      #   run: |
-      #     $files=@(Get-ChildItem -Path 'Magellan.DataWarehouse.YMDB' -Filter "*.StaticCodeAnalysis.Results.xml" -recurse)
-      #     foreach($f in $files){ xcopy $f.FullName '${{env.DIST_PATH}}' /y }
+      - name: collect msbuild report
+        run: |
+          $files=@(Get-ChildItem -Path 'DatabaseCodeAnalysis' -Filter "*.StaticCodeAnalysis.Results.xml" -recurse)
+          foreach($f in $files){ xcopy $f.FullName '${{env.DIST_PATH}}' /y }
           
       # - name: setup-sqlcheck
       #   run: |
