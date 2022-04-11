@@ -35,11 +35,19 @@ jobs:
           if($EXIST){ remove-Item -Recurse -Force '${{env.DIST_PATH}}' }
           New-Item '${{env.DIST_PATH}}' -Type directory -Force
 
+      #sqlproj-analysis convert -s xx.result.StaticCodeAnalysis.Results.xml -o xx.sarif 
       - name: collect msbuild report
         run: |
           $files=@(Get-ChildItem -Path 'DatabaseCodeAnalysis' -Filter "*.StaticCodeAnalysis.Results.xml" -recurse)
-          foreach($f in $files){ xcopy $f.FullName '${{env.DIST_PATH}}' /y }
-          
+          foreach($f in $files){ sqlproj-analysis convert -s $f.FullName -o '${{env.DIST_PATH}}' /y }
+      
+
+      # Upload SARIF file to GitHub Code Scanning Alerts
+      - name: Upload SARIF to GitHub
+        uses: github/codeql-action/upload-sarif@v1
+        with:
+          sarif_file: ${{env.DIST_PATH}}
+
       # - name: setup-sqlcheck
       #   run: |
       #     If (-not(Test-Path ".\sqlcheck.exe")) { Invoke-WebRequest https://github.com/jarulraj/sqlcheck/releases/download/v1.2/sqlcheck.exe -OutFile "sqlcheck.exe" }
