@@ -35,13 +35,15 @@ jobs:
           if($EXIST){ remove-Item -Recurse -Force '${{env.DIST_PATH}}' }
           New-Item '${{env.DIST_PATH}}' -Type directory -Force
 
-      #sqlproj-analysis convert -s xx.result.StaticCodeAnalysis.Results.xml -o xx.sarif 
+      - name: install sqlproj-analysis
+        run: |
+          npm install -g sqlproj-analysis-cli
+          
       - name: collect msbuild report
         run: |
           $files=@(Get-ChildItem -Path 'DatabaseCodeAnalysis' -Filter "*.StaticCodeAnalysis.Results.xml" -recurse)
           foreach($f in $files){ sqlproj-analysis convert -s $f.FullName -o '${{env.DIST_PATH}}' /y }
       
-
       # Upload SARIF file to GitHub Code Scanning Alerts
       - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v1
