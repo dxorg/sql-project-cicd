@@ -22,7 +22,7 @@ jobs:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
       
-      - name: setup-msbuild
+      - name: scan-sqlproj
         uses: yongmams/sqlproj-code-analysis-action@dev
         with:
           source-path: 'DatabaseCodeAnalysis\DatabaseCodeAnalysis.sqlproj'
