@@ -23,44 +23,13 @@ jobs:
       - uses: actions/checkout@v2
       
       - name: setup-msbuild
-        uses: microsoft/setup-msbuild@v1.1
-        
-      - name: build sqlproj
-        # working-directory: \
-        run: msbuild DatabaseCodeAnalysis.sln /p:Configuration="Release" /p:RunSqlCodeAnalysis="True" /p:SqlCodeAnalysisRules=""
-        
-      - name: create dist
-        run: |
-          $EXIST=(Test-Path '${{env.DIST_PATH}}')
-          if($EXIST){ remove-Item -Recurse -Force '${{env.DIST_PATH}}' }
-          New-Item '${{env.DIST_PATH}}' -Type directory -Force
-
-      - name: install sqlproj-analysis
-        run: |
-          npm install -g sqlproj-analysis-cli
-          
-      - name: collect msbuild report
-        run: |
-          $files=@(Get-ChildItem -Path 'DatabaseCodeAnalysis' -Filter "*.StaticCodeAnalysis.Results.xml" -recurse)
-          foreach($f in $files){ sqlproj-analysis convert -s $f.FullName -o '${{env.DIST_PATH}}' /y }
+        uses: yongmams/sqlproj-code-analysis-action@dev
+        with:
+          source-path: 'DatabaseCodeAnalysis\DatabaseCodeAnalysis.sqlproj'
+          outfile-path: ${{env.DIST_PATH}}
       
       # Upload SARIF file to GitHub Code Scanning Alerts
       - name: Upload SARIF to GitHub
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: ${{env.DIST_PATH}}
-
-      # - name: setup-sqlcheck
-      #   run: |
-      #     If (-not(Test-Path ".\sqlcheck.exe")) { Invoke-WebRequest https://github.com/jarulraj/sqlcheck/releases/download/v1.2/sqlcheck.exe -OutFile "sqlcheck.exe" }
-          
-      # - name: sqlcheck report
-      #   run: |
-      #     $files=@(Get-ChildItem -Path 'Magellan.DataWarehouse.YMDB' -Filter "*.sql" -recurse)
-      #     foreach($f in $files){ .\sqlcheck.exe -f $f.FullName > ('${{env.DIST_PATH}}\' + $f.Name + '.StaticCodeAnalysis.Results.txt') }  
-          
-      # - name: upload artifact
-      #   uses: actions/upload-artifact@v2
-      #   with:
-      #     name: StaticCodeAnalysis
-      #     path: ${{env.DIST_PATH}}
