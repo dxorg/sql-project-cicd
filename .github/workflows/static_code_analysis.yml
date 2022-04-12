@@ -10,6 +10,10 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+  pull_request:
+    branches:
+    - main
+
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # This workflow contains a single job called "build"
@@ -25,7 +29,7 @@ jobs:
       - name: scan-sqlproj
         uses: yongmams/sqlproj-code-analysis-action@dev
         with:
-          source-path: 'DatabaseCodeAnalysis\DatabaseCodeAnalysis.sqlproj'
+          source-path: 'DatabaseCodeAnalysis.sln'
           outfile-path: ${{env.DIST_PATH}}
       
       # Upload SARIF file to GitHub Code Scanning Alerts
